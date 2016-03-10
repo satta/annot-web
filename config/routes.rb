@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   get 'find' => 'jobs#show', as: :job_find
   get 'job/:id' => 'jobs#show'
   get 'jobs/:id' => 'jobs#show'
+  get 'jobs/:id/cancel' => 'jobs#cancel', as: :job_cancel
   get 'jobs/:id/orths' => 'jobs#orths'
   get 'jobs/:id/orths/cluster/:cluster' => 'jobs#orths_for_cluster', :constraints => { :cluster => /.*/ }
   get 'jobs/:id/clusters' => 'jobs#get_clusters', as: :clusters

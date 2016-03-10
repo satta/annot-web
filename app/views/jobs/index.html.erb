@@ -21,41 +21,51 @@
         </thead>
         <tbody>
 <% @outjobs.each do |job| %>
-            <tr>
-                <td width="100%"><span title="<%= job[:job_id] %>"><%= truncate(job[:name], :length => 40, :omission => '...') %></span></td>
-                <td><%= distance_of_time_in_words(Time.now,job[:created_at]) %> ago</td>
-                <td><%= job[:email] %></td>
-                <td>
-                  <% if job[:started_at] then %>
-                    <%= distance_of_time_in_words(Time.now,job[:started_at]) %> ago
-                  <% end %>
-                </td>
-                <td><% if job[:finished_at] then %>
-                    <%= distance_of_time_in_words(Time.now,job[:finished_at]) %> ago
-                  <% end %>
-                </td>
-                <td style="padding-left: 20px; padding-right: 20px;">
-                    <%= render partial: 'badge', locals: {:job => job} %>
-                </td>
-                <td>
-                   <div class="btn-group">
-                   <% if job[:job_id] then %>
-                     <% if not (CONFIG['example_job_id'] == job[:job_id]) then %>
-                       <%= link_to job_path(id: job[:job_id]),
-                                            method: :delete,
-                                            data: { confirm: "Are you sure?" } do %>
-                         <i class="glyphicon glyphicon-trash"></i> Delete
-                       <% end %>&nbsp;
-                     <% else %>
-                       <span class="text-warning">(Example)</span>
-                     <% end %>
-                     <%= link_to job_path(id: job[:job_id]) do %>
-                       <i class="glyphicon glyphicon-eye-open"></i> Results
-                     <% end %>
+        <tr>
+            <td width="100%">
+              <span title="<%= job[:job_id] %>">
+                <%= truncate(job[:name], :length => 40, :omission => '...') %>
+              </span>
+            </td>
+            <td><%= distance_of_time_in_words(Time.now,job[:created_at]) %> ago</td>
+            <td><%= job[:email] %></td>
+            <td>
+              <% if job[:started_at] then %>
+                <%= distance_of_time_in_words(Time.now,job[:started_at]) %> ago
+              <% end %>
+            </td>
+            <td><% if job[:finished_at] then %>
+                <%= distance_of_time_in_words(Time.now,job[:finished_at]) %> ago
+              <% end %>
+            </td>
+            <td style="padding-left: 20px; padding-right: 20px;">
+                <%= render partial: 'badge', locals: {:job => job} %>
+            </td>
+            <td>
+               <div class="btn-group">
+               <% if job[:job_id] then %>
+                 <% if not (CONFIG['example_job_id'] == job[:job_id]) then %>
+                   <%= link_to job_path(id: job[:job_id]),
+                                        method: :delete,
+                                        data: { confirm: "Are you sure?" } do %>
+                     <i class="glyphicon glyphicon-trash"></i> Delete
+                   <% end %>&nbsp;
+                 <% else %>
+                   <span class="text-warning">(Example)</span>
+                 <% end %>
+                 <%= link_to job_path(id: job[:job_id]) do %>
+                   <i class="glyphicon glyphicon-eye-open"></i> Results
+                 <% end %>
+                 <% if job[:started_at] and not job[:finished_at] and not job[:failed] %>
+                   <%= link_to job_cancel_path(id: job[:job_id],
+                                               data: { confirm: "Are you sure?" } ) do %>
+                     <i class="glyphicon glyphicon-remove-circle"></i> Cancel
                    <% end %>
-                   </div>
-                </td>
-            </tr>
+                 <% end %>
+               <% end %>
+               </div>
+            </td>
+        </tr>
 <% end %>
         </tbody>
     </table>

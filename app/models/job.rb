@@ -18,7 +18,9 @@ class Job < ActiveRecord::Base
       if not self[:job_id] then
         raise "no job ID yet"
       end
-      Rails.root.join('public', 'jobs', self[:job_id])
+      if self[:job_id].length > 1 then
+        Rails.root.join('public', 'jobs', self[:job_id])
+      end
     end
 
     def temp_directory
@@ -39,5 +41,34 @@ class Job < ActiveRecord::Base
         raise "CONFIG['workdir'] not set"
       end
       "#{CONFIG['workdir']}/#{self[:job_id]}"
+    end
+
+    def make_directories!
+      if not Dir.exist?(self.job_directory) then
+        Dir.mkdir(self.job_directory)
+      end
+      if not Dir.exist?(self.temp_directory) then
+        Dir.mkdir(self.temp_directory)
+      end
+      if not Dir.exist?(self.work_directory) then
+        Dir.mkdir(self.work_directory)
+      end
+    end
+
+    def cleanup_work_directories!
+      if not CONFIG['keep_work_directories'] then
+        if File.exist?(self.temp_directory) then
+          FileUtils.rm_rf(self.temp_directory)
+        end
+        if File.exist?(self.work_directory) then
+          FileUtils.rm_rf(self.work_directory)
+        end
+      end
+    end
+
+    def cleanup_job_directory!
+      if File.exist?(self.job_directory) then
+        FileUtils.rm_rf(self.job_directory)
+      end
     end
 end

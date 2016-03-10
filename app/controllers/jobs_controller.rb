@@ -86,6 +86,34 @@ class JobsController < ApplicationController
     end
   end
 
+  def cancel
+    if !logged_in? then
+      flash[:info] = "You do not have permission to cancel jobs in the " + \
+                     "queue."
+      redirect_to :welcome
+    else
+      thisjob = Job.find_by(:job_id => params[:id])
+      if thisjob then
+        HardWorker.cancel!(thisjob[:job_id])
+        queue = Sidekiq::Queue.new
+        queue.each do |job|
+          job.delete if job.jid == params[:id]
+        end
+        if File.exist?("#{thisjob.job_directory}") then
+          FileUtils.rm_rf("#{thisjob.job_directory}")
+        end
+        flash[:info] = "Job '#{thisjob[:name]}' was cancelled."
+        if logged_in? then
+          redirect_to :jobs
+        else
+          redirect_to "welcome/index"
+        end
+      else
+        render plain: "job #{params[:id]} not found", status: 404
+      end
+    end
+  end
+
   def destroy
     if !logged_in? then
       flash[:info] = "You do not have permission to delete jobs in the " + \
